@@ -92,7 +92,11 @@ jobs:
           fi
 
           # 3. 构建 Markdown 内容
-          MARKDOWN_TEXT="# ${TITLE} \n\n **项目**: -pj \n\n **提交信息**: ${COMMIT_MESSAGE} \n\n **访问地址**: [点击访问](${SERVER_URL}) \n\n > 来自 GitHub Actions 自动化流水线"
+          MARKDOWN_TEXT="# ${TITLE} 
+            **项目**: -pj 
+            **提交信息**: ${COMMIT_MESSAGE} 
+            **访问地址**: [点击访问](${SERVER_URL})  
+            > 来自 GitHub Actions 自动化流水线"
           # 4. 构造 JSON 负载
           JSON_PAYLOAD=$(jq -n \
             --arg msgtype "markdown" \
