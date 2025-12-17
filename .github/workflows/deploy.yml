@@ -88,10 +88,27 @@ jobs:
           else
             TITILE="❌ 部署失败"
           fi
-
+          
           # 2. 构建 Markdown 消息内容
-          # 注意：这里我们只构建 Markdown 文本，不进行 JSON 转义，交给 jq 处理
-          MARKDOWN_TEXT="# ${TITLE} \n\n **项目**: -pj \n\n **提交信息**: ${COMMIT_MESSAGE} \n\n **访问地址**: [点击访问](${SERVER_URL}) \n\n > 来自 GitHub Actions 自动化流水线"
+          # 使用 `read -r -d ''` heredoc 方式构建多行字符串
+          # 这样字符串中的换行符就是真正的 \n，而不是字面上的 \ 和 n
+          # jq 在处理时会将其正确转义为 JSON 内部的 \n (在 echo 调试输出中显示为 \\n)
+          # 钉钉机器人收到后会正确解析为换行，而不是显示 \\n。
+          read -r -d '' MARKDOWN_TEXT <<EOF
+          # ${TITLE}
+
+          **项目**: -pj
+
+          **提交信息**: ${COMMIT_MESSAGE}
+
+          **访问地址**: [点击访问](${SERVER_URL})
+
+          ---
+
+          > 关键词检测：GitHub 通知 警报
+          EOF
+
+          echo "Debug: MARKDOWN_TEXT (before jq processing):\n$MARKDOWN_TEXT" # 调试：查看原始 Markdown 文本
 
           # 3. 使用 jq 构造完整的 JSON 负载
           # jq 会自动处理所有变量中的特殊字符转义，确保 JSON 格式正确
