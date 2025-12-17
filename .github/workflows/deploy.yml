@@ -93,13 +93,13 @@ jobs:
             # 构建钉钉Markdown通知内容（echo -e 解析换行）
             MARKDOWN_TEXT=$(echo -e "# ${TITLE}
             
-**项目**: -pj
+            **项目**: -pj
 
-**提交信息**: ${COMMIT_MESSAGE}
+            **提交信息**: ${COMMIT_MESSAGE}
 
-**访问地址**: [点击访问](${SERVER_URL})
+            **访问地址**: [点击访问](${SERVER_URL})
 
-> 来自 GitHub Actions 自动化流水线")
+            > 来自 GitHub Actions 自动化流水线")
 
             # 构造JSON（显式转义特殊字符，避免格式错误）
             JSON_PAYLOAD=$(jq -n \
