@@ -80,33 +80,27 @@ jobs:
           WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           DEPLOY_RESULT: ${{ needs.deploy.result }}
-          SERVER_URL: http://59.110.53.164:5000 # 网页的访问地址
+          SERVER_URL: http://59.110.53.164:5000
         run: |
-          STATUS="{{ needs.deploy.result }"
-          if [ "$STATUS" != "success" ]; then 
-            TITILE="✅ 部署成功"
+          # 1. 变量赋值
+          STATUS="${{ needs.deploy.result }}"
+          # 2. 判断逻辑
+          if [ "$STATUS" = "success" ]; then 
+            TITLE="✅ 部署成功"
           else
-            TITILE="❌ 部署失败"
+            TITLE="❌ 部署失败"
           fi
-
-          # 2. 构建 Markdown 消息内容
-          # 注意：这里我们只构建 Markdown 文本，不进行 JSON 转义，交给 jq 处理
+          # 3. 构建 Markdown 内容
           MARKDOWN_TEXT="# ${TITLE} \n\n **项目**: -pj \n\n **提交信息**: ${COMMIT_MESSAGE} \n\n **访问地址**: [点击访问](${SERVER_URL}) \n\n > 来自 GitHub Actions 自动化流水线"
-
-          # 3. 使用 jq 构造完整的 JSON 负载
-          # jq 会自动处理所有变量中的特殊字符转义，确保 JSON 格式正确
+          # 4. 构造 JSON 负载
           JSON_PAYLOAD=$(jq -n \
             --arg msgtype "markdown" \
             --arg title "GitHub Actions 通知" \
             --arg text "$MARKDOWN_TEXT" \
             '{msgtype: $msgtype, markdown: {title: $title, text: $text}}')
-          
-          # 4. 打印将发送的 JSON 负载以进行调试
-          echo "Debug: JSON Payload to send: $JSON_PAYLOAD"
-
-          # 发送请求到钉钉 (关键词 GitHub 必须有)
+          # 5. 发送请求
           curl -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD"      
+            -d "$JSON_PAYLOAD"   
 
           
