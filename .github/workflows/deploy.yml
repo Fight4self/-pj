@@ -71,52 +71,37 @@ jobs:
             # 清理无用的旧镜像
             docker image prune -f
   notify:
-      needs: deploy
-      runs-on: ubuntu-latest
-      if: always() # 无论部署成功/失败都执行
-      steps:
-        - name: Dingtalk Notification
-          env:
-            WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
-            # 转义提交信息中的特殊字符（避免JSON解析失败）
-            COMMIT_MESSAGE: ${{ github.event.head_commit.message | replace('\n', '\\n') | replace('"', '\\"') }}
-            SERVER_URL: http://59.110.53.164:5000
-            DEPLOY_RESULT: ${{ needs.deploy.result }}
-          run: |
-            # 判断部署状态
-            if [ "$DEPLOY_RESULT" = "success" ]; then 
-              TITLE="✅ 部署成功"
-            else
-              TITLE="❌ 部署失败"
-            fi
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Dingtalk Notification
+        env:
+          WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          SERVER_URL: http://59.110.53.164:5000
+        run: |
+          # 1. 变量赋值
+          STATUS="${{ needs.deploy.result }}"
+          # 2. 判断逻辑
+          if [ "$STATUS" = "success" ]; then 
+            TITLE="✅ 部署成功"
+          else
+            TITLE="❌ 部署失败"
+          fi
 
-            # 构建钉钉Markdown通知内容（echo -e 解析换行）
-            MARKDOWN_TEXT=$(echo -e "# ${TITLE}
-            
-            **项目**: -pj
-
-            **提交信息**: ${COMMIT_MESSAGE}
-
-            **访问地址**: [点击访问](${SERVER_URL})
-
-            > 来自 GitHub Actions 自动化流水线")
-
-            # 构造JSON（显式转义特殊字符，避免格式错误）
-            JSON_PAYLOAD=$(jq -n \
-              --arg msgtype "markdown" \
-              --arg title "GitHub Actions 部署通知" \
-              --arg text "$MARKDOWN_TEXT" \
-              '{
-                msgtype: $msgtype,
-                markdown: {
-                  title: $title,
-                  text: $text
-                }
-              }')
-
-            # 发送钉钉通知
-            curl -s -X POST "$WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD"
+          # 3. 构建 Markdown 内容
+          MARKDOWN_TEXT="# ${TITLE} \n\n **项目**: -pj \n\n **提交信息**: ${COMMIT_MESSAGE} \n\n **访问地址**: [点击访问](${SERVER_URL}) \n\n > 来自 GitHub Actions 自动化流水线"
+          # 4. 构造 JSON 负载
+          JSON_PAYLOAD=$(jq -n \
+            --arg msgtype "markdown" \
+            --arg title "GitHub Actions 通知" \
+            --arg text "$MARKDOWN_TEXT" \
+            '{msgtype: $msgtype, markdown: {title: $title, text: $text}}')
+          # 5. 发送请求
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD"   
 
           
