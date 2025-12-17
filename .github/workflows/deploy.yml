@@ -70,3 +70,32 @@ jobs:
             
             # 清理无用的旧镜像
             docker image prune -f
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dingtalk Notification
+        run: |
+          STATUS="{{ needs.deploy.result }"
+          if [ "$STATUS" != "success" ]; then
+            EMOJI="✅"  
+            TITILE="部署成功"
+          else
+            EMOJI="❌"
+            TITILE="部署失败"
+          fi
+          # 发送请求到钉钉 (关键词 GitHub 必须有)
+          curl '${{ secrets.DINGTALK_WEBHOOK }}' \
+          -H 'Content-Type: application/json' \
+          -d '{
+                \"msgtype\": \"markdown\",
+                \"markdown\": {
+                \"title\": \"Github Actions 通知\",
+                \"text\": \"# ${EMOJI} ${TITLE}\n\n > **PJ项目**： \n
+                  \n  > **提交信息**: ${{ github.event.head_commit.message }} \n
+                  \n **访问**: [http://8.136.36.185:5000](http://8.136.36.185:5000) \n
+                  \n > 来自 GitHub Actions\"
+                }
+              }'        
+
+          
