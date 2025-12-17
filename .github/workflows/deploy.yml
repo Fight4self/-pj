@@ -80,7 +80,7 @@ jobs:
           WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           DEPLOY_RESULT: ${{ needs.deploy.result }}
-          SERVER_URL: http://8.136.36.185:5000 # 你的服务器访问地址
+          SERVER_URL: http://59.110.53.164:5000 # 网页的访问地址
         run: |
           STATUS="{{ needs.deploy.result }"
           if [ "$STATUS" != "success" ]; then 
@@ -91,10 +91,7 @@ jobs:
 
           # 2. 构建 Markdown 消息内容
           # 注意：这里我们只构建 Markdown 文本，不进行 JSON 转义，交给 jq 处理
-          MARKDOWN_TEXT="# ${TITLE} \n
-          \n **项目**: -pj \n\n **提交信息**: ${COMMIT_MESSAGE} \n
-          \n **访问地址**: [点击访问](${SERVER_URL}) \n
-          \n > 来自 GitHub Actions 自动化流水线"
+          MARKDOWN_TEXT="# ${TITLE} \n\n **项目**: -pj \n\n **提交信息**: ${COMMIT_MESSAGE} \n\n **访问地址**: [点击访问](${SERVER_URL}) \n\n > 来自 GitHub Actions 自动化流水线"
 
           # 3. 使用 jq 构造完整的 JSON 负载
           # jq 会自动处理所有变量中的特殊字符转义，确保 JSON 格式正确
