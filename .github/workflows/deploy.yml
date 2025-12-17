@@ -96,7 +96,7 @@ jobs:
           # 4. 构造 JSON 负载
           JSON_PAYLOAD=$(jq -n \
             --arg msgtype "markdown" \
-            --arg title "GitHub Actions 通知" \
+            --arg title "GitHub Actions" \
             --arg text "$MARKDOWN_TEXT" \
             '{msgtype: $msgtype, markdown: {title: $title, text: $text}}')
           # 5. 发送请求
