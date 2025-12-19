@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       language:
-        description: 'ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½'
+        description: 'ÏîÄ¿ÓïÑÔ'
         required: true
         default: 'python'
         type: choice
@@ -11,11 +11,11 @@ on:
         - python
         - node
       port:
-        description: 'ï¿½ï¿½Â¶ï¿½Ë¿ï¿½'
+        description: '±©Â¶¶Ë¿Ú'
         required: true
         default: '5000'
       entrypoint:
-        description: 'ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ (ï¿½ï¿½ app.py)'
+        description: 'Èë¿ÚÎÄ¼þ (Èç app.py)'
         required: true
         default: 'app.py'
 
@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate Dockerfile Script
         run: |
-          # ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½ Shell ï¿½Å±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+          # ÕâÊÇÒ»¸ö¼òÒ×µÄ Shell ½Å±¾Éú³ÉÆ÷
           LANG="${{ inputs.language }}"
           PORT="${{ inputs.port }}"
           ENTRY="${{ inputs.entrypoint }}"
@@ -47,7 +47,7 @@ jobs:
           CMD ["python", "$ENTRY"]
           EOF
             
-            # ï¿½òµ¥µï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ requirements.txt ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+            # ¼òµ¥µÄÒÀÀµÉú³É (³¢ÊÔÉú³É requirements.txt Èç¹û²»´æÔÚ)
             if [ ! -f requirements.txt ]; then
               echo "flask" > requirements.txt
             fi
