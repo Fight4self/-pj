@@ -118,8 +118,14 @@ jobs:
   debug-event:
     runs-on: ubuntu-latest
     steps:
-      - name: Print GitHub Event
+      # - name: Print GitHub Event
+      #   run: |
+      #     echo "${{ toJSON(github.event) }}"
+      
+      - name: Test Get message
         run: |
-          echo "${{ toJSON(github.event) }}"
+          echo "Commit message: ${{ github.event.ref }}"
+          echo "Commit message: ${{ github.event.sender.login }}"
+          echo "Commit message: ${{ github.event.repository.pushed_at }}"
 
           
