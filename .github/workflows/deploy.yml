@@ -70,6 +70,9 @@ jobs:
             
             # 清理无用的旧镜像
             docker image prune -f
+  # ==========================================
+  # 第三步：将结果推送到钉钉( notify )
+  # ==========================================
   notify:
     needs: deploy
     runs-on: ubuntu-latest
