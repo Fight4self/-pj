@@ -87,6 +87,7 @@ jobs:
             
             # 清理无用的旧镜像
             docker image prune -f
+  # 给钉钉发消息
   notify:
       needs: deploy
       runs-on: ubuntu-latest
@@ -117,10 +118,17 @@ jobs:
             else
               TITLE="❌ 部署失败"
             fi
+          
             if [ "$REF_NAME" == "main" ]; then
               SERVER_URL=${SERVER_URL_main}
             else
               SERVER_URL=${SERVER_URL_dev}
+            fi
+          
+            if [ "$COMMIT_MESSAGE" == "" ]; then
+              COMMIT_MESSAGE=${SERVER_URL_main}
+            else
+              COMMIT_MESSAGE=${Here no more message}
             fi
 
             # 3. 构建 Markdown 内容
