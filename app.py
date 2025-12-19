@@ -23,7 +23,6 @@ def index():
                            hostname=container_id,
                            current_time=now,
                            client_ip=client_ip)
-
 if __name__ == '__main__':
     # 监听所有 IP，端口 5000
     app.run(host='0.0.0.0', port=5000)

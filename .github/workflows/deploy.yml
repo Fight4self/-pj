@@ -70,3 +70,45 @@ jobs:
             
             # 清理无用的旧镜像
             docker image prune -f
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Dingtalk Notification
+        env:
+          WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          SERVER_URL: http://59.110.53.164:5000
+        run: |
+          # 1. 变量赋值
+          STATUS="${{ needs.deploy.result }}"
+          # 2. 判断逻辑
+          if [ "$STATUS" = "success" ]; then 
+            TITLE="✅ 部署成功"
+          else
+            TITLE="❌ 部署失败"
+          fi
+
+          # 3. 构建 Markdown 内容
+          MARKDOWN_TEXT="# ${TITLE} 
+            **项目**: -pj 
+
+            **提交信息**: ${COMMIT_MESSAGE} 
+
+            **访问地址**: [点击访问](${SERVER_URL})  
+            
+            > 来自 GitHub Actions 自动化流水线"
+          # 4. 构造 JSON 负载
+          JSON_PAYLOAD=$(jq -n \
+            --arg msgtype "markdown" \
+            --arg title "GitHub Actions" \
+            --arg text "$MARKDOWN_TEXT" \
+            '{msgtype: $msgtype, markdown: {title: $title, text: $text}}')
+          # 5. 发送请求
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD"   
+
+          
