@@ -93,6 +93,10 @@ jobs:
       runs-on: ubuntu-latest
       if: always()
       steps:
+        # 下载代码
+        - name: Checkout repository code
+          uses: actions/checkout@v4
+        # 因为这里需要 notify-.sh 脚本，发送钉钉通知
         - name: Dingtalk Notification
           env:
             WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
@@ -110,55 +114,10 @@ jobs:
             # 默认使用 main 访问地址
             SERVER_URL: http://59.110.53.164:5000
           run: |
-            # 1. 变量赋值
-            STATUS="${{ needs.deploy.result }}"
-            # 2. 判断逻辑, 查看是否部署成功以及相应的访问地址
-            if [ "$STATUS" = "success" ]; then 
-              TITLE="✅ 部署成功"
-            else
-              TITLE="❌ 部署失败"
-            fi
-          
-            if [ "$REF_NAME" == "main" ]; then
-              SERVER_URL=${SERVER_URL_main}
-            else
-              SERVER_URL=${SERVER_URL_dev}
-            fi
-          
-            if [ "$COMMIT_MESSAGE" == "" ]; then
-              COMMIT_MESSAGE="Here no more message"
-            else
-              COMMIT_MESSAGE=${COMMIT_MESSAGE}
-            fi
+              # 1. 给脚本赋予执行权限
+              chmod +x ./scripts/dingtalk-notify.sh
 
-            # 3. 构建 Markdown 内容
-            MARKDOWN_TEXT="# ${TITLE} 
-              **项目**: -pj 
-
-              **提交信息**: ${COMMIT_MESSAGE} 
-
-              **分支信息**: ${REF_NAME}
-
-              **流水线触发用户**: ${ACTOR} 
-
-              **代码更改用户**: ${SENDER_LOGIN}
-
-              **事件类型**: ${EVENET_NAME}
-
-              **代码更新时间**: ${EVENT_REPOSITORY_PUSHED_AT}
-
-              **访问地址**: [点击访问](${SERVER_URL})  
-              
-              > 来自 GitHub Actions 自动化流水线"
-            # 4. 构造 JSON 负载
-            JSON_PAYLOAD=$(jq -n \
-              --arg msgtype "markdown" \
-              --arg title "GitHub Actions" \
-              --arg text "$MARKDOWN_TEXT" \
-              '{msgtype: $msgtype, markdown: {title: $title, text: $text}}')
-            # 5. 发送请求
-            curl -X POST "$WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD"   
+              # 2. 运行脚本
+              ./scripts/dingtalk-notify.sh
 
           
