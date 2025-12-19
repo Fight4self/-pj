@@ -11,9 +11,8 @@ env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/flask-demo-app
 
 jobs:
-  # ==========================================
-  # 第一步：构建并推送镜像 (Build & Push)
-  # ==========================================
+  # 构建并推送镜像
+  
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -39,9 +38,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_NAME }}:latest
 
-  # ==========================================
-  # 第二步：部署到服务器 (Deploy)
-  # ==========================================
+  # 部署到服务器 (Deploy)
   deploy:
     needs: build-and-push # 只有构建成功才执行部署
     runs-on: ubuntu-latest
@@ -56,9 +53,9 @@ jobs:
           script: |
             set -e
             
-            # 1. 定义变量：根据当前分支名决定 容器名 和 端口
-            # 如果是 main 分支 -> 容器名 flask-app, 端口 5000
-            # 如果是 dev 分支  -> 容器名 flask-app-dev, 端口 5001
+            # 定义变量：根据当前分支名决定 容器名 和 端口
+            # 如果是 main 分支,容器名 flask-app, 端口 5000
+            # 如果是 dev 分支,容器名 flask-app-dev, 端口 5001
             
             BRANCH_NAME=${{ github.ref_name }}
             
@@ -72,11 +69,11 @@ jobs:
             
             echo "🚀 Deploying branch: $BRANCH_NAME to Port: $PORT"
             
-            # 2. 停止并删除对应的旧容器
+            # 停止并删除对应的旧容器
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
             
-            # 3. 启动新容器 (注意这里使用了变量)
+            # 启动新容器 (注意这里使用了变量)
             docker pull ${{ env.IMAGE_NAME }}:latest
             
             docker run -d \
