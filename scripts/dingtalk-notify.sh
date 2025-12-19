@@ -13,7 +13,13 @@ else
 TITLE="❌ 部署失败"
 fi
 
- # 3. 构建 Markdown 内容
+if [ "$COMMIT_MESSAGE" = "" ]; then 
+COMMIT_MESSAGE="Here no more message."
+else
+COMMIT_MESSAGE="$COMMIT_MESSAGE"
+fi
+
+# 3. 构建 Markdown 内容
 MARKDOWN_TEXT="# ${TITLE} 
 **项目**: -pj 
 
