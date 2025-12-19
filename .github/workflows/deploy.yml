@@ -126,9 +126,9 @@ jobs:
             fi
           
             if [ "$COMMIT_MESSAGE" == "" ]; then
-              COMMIT_MESSAGE=${SERVER_URL_main}
+              COMMIT_MESSAGE="Here no more message"
             else
-              COMMIT_MESSAGE=${Here no more message}
+              COMMIT_MESSAGE=${COMMIT_MESSAGE}
             fi
 
             # 3. 构建 Markdown 内容
