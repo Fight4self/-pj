@@ -124,8 +124,12 @@ jobs:
       
       - name: Test Get message
         run: |
-          echo "Commit message: ${{ github.event.ref }}"
+          echo "Commit message: ${{ github.ref_name }}"
           echo "Commit message: ${{ github.event.sender.login }}"
           echo "Commit message: ${{ github.event.repository.pushed_at }}"
-
+        
+      - name: Print GitHub
+        run: |
+          echo "${{ toJSON(github) }}"
+      
           
