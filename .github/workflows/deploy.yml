@@ -114,4 +114,12 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$JSON_PAYLOAD"   
 
+  # debug
+  debug-event:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print GitHub Event
+        run: |
+          echo "${{ toJSON(github.event) }}"
+
           
