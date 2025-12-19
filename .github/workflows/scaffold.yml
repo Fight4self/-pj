@@ -1,0 +1,73 @@
+name: Generate Docker Assets
+on:
+  workflow_dispatch:
+    inputs:
+      language:
+        description: '��Ŀ����'
+        required: true
+        default: 'python'
+        type: choice
+        options:
+        - python
+        - node
+      port:
+        description: '��¶�˿�'
+        required: true
+        default: '5000'
+      entrypoint:
+        description: '����ļ� (�� app.py)'
+        required: true
+        default: 'app.py'
+
+permissions:
+  contents: write
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate Dockerfile Script
+        run: |
+          # ����һ�����׵� Shell �ű�������
+          LANG="${{ inputs.language }}"
+          PORT="${{ inputs.port }}"
+          ENTRY="${{ inputs.entrypoint }}"
+          
+          if [ "$LANG" == "python" ]; then
+            cat <<EOF > Dockerfile
+          FROM python:3.9-slim
+          WORKDIR /app
+          COPY requirements.txt .
+          RUN pip install --no-cache-dir -r requirements.txt
+          COPY . .
+          EXPOSE $PORT
+          CMD ["python", "$ENTRY"]
+          EOF
+            
+            # �򵥵��������� (�������� requirements.txt ���������)
+            if [ ! -f requirements.txt ]; then
+              echo "flask" > requirements.txt
+            fi
+            
+          elif [ "$LANG" == "node" ]; then
+            cat <<EOF > Dockerfile
+          FROM node:16-alpine
+          WORKDIR /app
+          COPY package*.json ./
+          RUN npm install
+          COPY . .
+          EXPOSE $PORT
+          CMD ["node", "$ENTRY"]
+          EOF
+          fi
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add Dockerfile requirements.txt
+          git commit -m "Auto-generated Docker assets" || echo "No changes to commit"
+          git push
