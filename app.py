@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 # 定义版本号（修改这里来演示版本更新）
-APP_VERSION = "v2.0 (Pro Edition)"
+APP_VERSION = "v3.0 (测试版)"
 
 @app.route('/')
 def index():
