@@ -102,15 +102,25 @@ jobs:
             EVENET_NAME: ${{ github.event_name }}
             EVENT_REPOSITORY_PUSHED_AT: ${{github.event.repository.pushed_at}}
             DEPLOY_RESULT: ${{ needs.deploy.result }}
+            # main 分支访问地址
+            SERVER_URL_main: http://59.110.53.164:5000
+            # dev 分支访问地址
+            SERVER_URL_dev: http://59.110.53.164:5001
+            # 默认使用 main 访问地址
             SERVER_URL: http://59.110.53.164:5000
           run: |
             # 1. 变量赋值
             STATUS="${{ needs.deploy.result }}"
-            # 2. 判断逻辑
+            # 2. 判断逻辑, 查看是否部署成功以及相应的访问地址
             if [ "$STATUS" = "success" ]; then 
               TITLE="✅ 部署成功"
             else
               TITLE="❌ 部署失败"
+            fi
+            if [ "$REF_NAME" == "main" ]; then
+              SERVER_URL=${SERVER_URL_main}
+            else
+              SERVER_URL=${SERVER_URL_dev}
             fi
 
             # 3. 构建 Markdown 内容
