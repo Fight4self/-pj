@@ -92,6 +92,10 @@ jobs:
       runs-on: ubuntu-latest
       if: always()
       steps:
+        # 下载代码
+        - name: Checkout repository code
+          uses: actions/checkout@v4
+        # 因为这里需要 notify-.sh 脚本，发送钉钉通知
         - name: Dingtalk Notification
           env:
             WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
@@ -110,8 +114,8 @@ jobs:
             SERVER_URL: http://59.110.53.164:5000
           run: |
               # 1. 给脚本赋予执行权限
-              chmod +x ../../scripts/dingtalk-notify.sh
+              chmod +x ./scripts/dingtalk-notify.sh
 
               # 2. 运行脚本
-              ../../scripts/dingtalk-notify.sh
+              ./scripts/dingtalk-notify.sh
           
