@@ -82,6 +82,11 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.DINGTALK_WEBHOOK }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          ACTOR: ${{ github.actor }}
+          REF_NAME: ${{ github.ref_name }}
+          SENDER_LOGIN: ${{ github.event.sender.login }}
+          EVENET_NAME: ${{ github.event_name }}
+          EVENT_REPOSITORY_PUSHED_AT: ${{github.event.repository.pushed_at}}
           DEPLOY_RESULT: ${{ needs.deploy.result }}
           SERVER_URL: http://59.110.53.164:5000
         run: |
@@ -100,6 +105,14 @@ jobs:
 
             **提交信息**: ${COMMIT_MESSAGE} 
 
+            **分支信息**: ${REF_NAME}
+
+            **操作用户**: ${ACTOR} (${SENDER_LOGIN})
+
+            **事件类型**: ${EVENET_NAME}
+
+            **代码更新时间**: ${EVENT_REPOSITORY_PUSHED_AT}
+
             **访问地址**: [点击访问](${SERVER_URL})  
             
             > 来自 GitHub Actions 自动化流水线"
@@ -114,22 +127,5 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$JSON_PAYLOAD"   
 
-  # debug
-  debug-event:
-    runs-on: ubuntu-latest
-    steps:
-      # - name: Print GitHub Event
-      #   run: |
-      #     echo "${{ toJSON(github.event) }}"
-      
-      - name: Test Get message
-        run: |
-          echo "Commit message: ${{ github.ref_name }}"
-          echo "Commit message: ${{ github.event.sender.login }}"
-          echo "Commit message: ${{ github.event.repository.pushed_at }}"
-        
-      - name: Print GitHub
-        run: |
-          echo "${{ toJSON(github) }}"
       
           
