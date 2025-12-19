@@ -107,7 +107,9 @@ jobs:
 
             **分支信息**: ${REF_NAME}
 
-            **操作用户**: ${ACTOR} (${SENDER_LOGIN})
+            **流水线触发用户**: ${ACTOR} 
+
+            **代码更改用户**: ${SENDER_LOGIN}
 
             **事件类型**: ${EVENET_NAME}
 
