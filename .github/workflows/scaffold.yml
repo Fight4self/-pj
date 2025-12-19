@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       language:
-        description: '��Ŀ����'
+        description: '项目语言'
         required: true
         default: 'python'
         type: choice
@@ -11,11 +11,11 @@ on:
         - python
         - node
       port:
-        description: '��¶�˿�'
+        description: '暴露端口'
         required: true
         default: '5000'
       entrypoint:
-        description: '����ļ� (�� app.py)'
+        description: '入口文件 (如 app.py)'
         required: true
         default: 'app.py'
 
@@ -31,7 +31,7 @@ jobs:
 
       - name: Generate Dockerfile Script
         run: |
-          # ����һ�����׵� Shell �ű�������
+          # 这是一个简易的 Shell 脚本生成器
           LANG="${{ inputs.language }}"
           PORT="${{ inputs.port }}"
           ENTRY="${{ inputs.entrypoint }}"
@@ -47,7 +47,7 @@ jobs:
           CMD ["python", "$ENTRY"]
           EOF
             
-            # �򵥵��������� (�������� requirements.txt ���������)
+            # 简单的依赖生成 (尝试生成 requirements.txt 如果不存在)
             if [ ! -f requirements.txt ]; then
               echo "flask" > requirements.txt
             fi
